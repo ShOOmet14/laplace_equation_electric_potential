@@ -27,17 +27,16 @@ POZIOMY_Y_DO_WYKRESU = (0.15, 0.30, 0.45, 0.60, 0.75, 0.90)
 ITERACJE_DO_WYKRESU = (20, 100, 200, 2000)
 
 
-# Część rzeczywista badanej funkcji zespolonej, tutaj f(z) = exp(z),
-# gdzie z = x + iy
-
-
 def u_dokladne(
     x: float | npt.NDArray[np.float64], y: float | npt.NDArray[np.float64]
 ) -> float | npt.NDArray[np.float64]:
+    """
+    Część rzeczywista badanej funkcji zespolonej,
+    tutaj f(z) = exp(z), gdzie z = x + iy
+    """
     return np.exp(x) * np.cos(y)
 
 
-# Funkcja rozwiązująca równanie Laplace'a metodą relaksacyjną
 class WynikLaplace(TypedDict):
     x: npt.NDArray[np.float64]
     y: npt.NDArray[np.float64]
@@ -57,6 +56,15 @@ def rozwiaz_laplace(
     max_iteracji: int,
     iteracje_do_zapisu: Collection[int] | None = None,
 ) -> WynikLaplace:
+    """
+    Funkcja rozwiązująca równanie Laplace'a metodą Gausa_Seidla
+
+    Wejście: rozmiar siatki, tolerancja, maksymalna liczba iteracji,
+    iteracje, dla których zapisywane są migawki rozwiązania
+
+    Wyjście: słownik zawierający rozwiązanie numeryczne, sitakę, liczbę iteracji oraz dane do analizy błędu
+    """
+
     iteracje_zapisu = set(iteracje_do_zapisu or ())
 
     x = np.linspace(0.0, DLUGOSC_BOKU, rozmiar_siatki)
@@ -97,13 +105,6 @@ def rozwiaz_laplace(
                 if zmiana > max_zmiana:
                     max_zmiana = zmiana
 
-        """
-        u[:, 0] = u_dokladne(x, 0.0)
-        u[:, -1] = u_dokladne(x, DLUGOSC_BOKU)
-        u[0, :] = u_dokladne(0.0, y)
-        u[-1, :] = u_dokladne(DLUGOSC_BOKU, y)
-        """
-
         if iteracja in iteracje_zapisu:
             migawki[iteracja] = u.copy()
 
@@ -135,3 +136,8 @@ def rozwiaz_laplace(
         "blad_maksymalny": blad_max,
         "rozmiar_siatki": rozmiar_siatki,
     }
+
+
+#
+
+# if __name__ == "__main__":
