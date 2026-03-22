@@ -1,6 +1,0 @@
-Wykres 3D dla postaci analitycznej
-Mapa błędu numeryczne - analityczne
-Dodawać dynamiczne dodawanie funkcji zespolonej
-Program powinien obliczać wszystkie wyrazy brzegowe itd. sam, nie powinno się zmieniać w kodzie
-Organizacja, rozłożenie pliku na kilka
-aplikacja okienkowa

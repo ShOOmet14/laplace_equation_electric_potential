@@ -1,1 +1,0 @@
-If you need to continue a long conversation, ask ChatGPT to create a "full synthesis" or synopsis of the discussion, then copy that summary into a new, faster chat
