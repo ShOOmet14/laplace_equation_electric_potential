@@ -1,53 +1,3 @@
-import csv
-import numpy as np
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D  # noqa: F401
-
-
-# ============================================================
-# USTAWIENIA GLOWNE
-# ============================================================
-
-A = 1.0
-
-# Ustawienia do badania siatki
-ROZMIARY_SIATKI = [10, 20, 40, 80]
-TOLERANCJE = {
-    10: 1e-10,
-    20: 1e-10,
-    40: 1e-11,
-    80: 1e-11,
-}
-MAKS_ITERACJI_BADANIE = 50000
-
-# Ustawienia do wykresow
-N_SIATKA_WYKRESY = 81
-TOLERANCJA_WYKRESY = 1e-10
-MAKS_ITERACJI_WYKRESY = 30000
-
-POZIOMY_Y_DO_WYKRESU = [0.15, 0.30, 0.45, 0.60, 0.75, 0.90]
-ITERACJE_DO_WYKRESU = [20, 100, 500, 2000]
-
-ZAPISZ_CSV = True
-POKAZ_WYKRESY = True
-
-
-# ============================================================
-# FUNKCJA BADANA
-# f(z) = exp(z), z = x + i y
-# u(x,y) = Re(f(z)) = exp(x) * cos(y)
-# ============================================================
-
-
-def u_dokladne(x, y):
-    return np.exp(x) * np.cos(y)
-
-
-# ============================================================
-# SOLVER 2D - GAUSS-SEIDEL
-# ============================================================
-
-
 def rozwiaz_laplace_relaksacja(
     n_siatki,
     tolerancja,
@@ -188,15 +138,6 @@ def uruchom_badanie_siatki():
     else:
         print("\nNie osiagnieto poziomu 1e-4 dla zadanych siatek.")
 
-    if ZAPISZ_CSV:
-        with open("wyniki.csv", "w", newline="", encoding="utf-8") as plik:
-            writer = csv.writer(plik)
-            writer.writerow(["N", "h", "iteracje", "blad_maksymalny"])
-            for w in wyniki:
-                writer.writerow([w["N"], w["h"], w["iteracje"], w["blad_maksymalny"]])
-
-        print("Zapisano plik: wyniki.csv")
-
     return wyniki
 
 
@@ -228,11 +169,7 @@ def rysuj_przekroje_dokladne(wynik):
     plt.legend()
     plt.tight_layout()
     plt.savefig("funkcja_badana_przekroje.png", dpi=200)
-
-    if POKAZ_WYKRESY:
-        plt.show()
-    else:
-        plt.close()
+    plt.show()
 
 
 # ============================================================
@@ -285,10 +222,7 @@ def rysuj_przekroje_dla_iteracji(wynik):
         plt.tight_layout()
         plt.savefig(f"przekroje_iteracja_{liczba_iteracji}.png", dpi=200)
 
-        if POKAZ_WYKRESY:
-            plt.show()
-        else:
-            plt.close()
+        plt.show()
 
 
 # ============================================================
@@ -335,10 +269,7 @@ def rysuj_przekroje_koncowe(wynik):
     plt.tight_layout()
     plt.savefig("przekroje_iteracja_koniec.png", dpi=200)
 
-    if POKAZ_WYKRESY:
-        plt.show()
-    else:
-        plt.close()
+    plt.show()
 
 
 # ============================================================
@@ -373,10 +304,7 @@ def rysuj_rozwiazanie_3d(wynik):
     plt.tight_layout()
     plt.savefig("rozwiazanie_3d.png", dpi=200)
 
-    if POKAZ_WYKRESY:
-        plt.show()
-    else:
-        plt.close()
+    plt.show()
 
 
 # ============================================================
