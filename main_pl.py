@@ -1,11 +1,15 @@
 from collections.abc import Collection
 from typing import TypedDict
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
 
 # Ustawienia / Stałe
+
+KATALOG_WYKRESOW = Path("images")
+KATALOG_WYKRESOW.mkdir(exist_ok=True)
 
 DLUGOSC_BOKU = 1.0
 
@@ -263,7 +267,182 @@ def rysuj_przekroje(
     plt.grid(True)
     plt.legend()
     plt.tight_layout()
-    plt.savefig("przekroje.png", dpi=200)
+    plt.savefig(KATALOG_WYKRESOW / "przekroje.png", dpi=200)
+    plt.show()
 
 
-# if __name__ == "__main__":
+def rysuj_przekroje_dla_iteracji(wynik: WynikLaplace) -> None:
+    """Rysuje przekroje rozwiazania dla wybranych iteracji.
+
+    Parametry:
+    - wynik: Wynik obliczen zawierajacy x, y, rozwiazanie dokladne i migawki kolejnych przyblizen.
+
+    Zwraca:
+    - nic, funkcja tworzy, zapisuje i wyświetla wykresy przekrojow.
+    """
+
+    x = wynik["x"]
+    y = wynik["y"]
+    u_dokladne_siatka = wynik["u_dokladne"]
+    migawki = wynik["migawki"]
+
+    indeksy_poziomow_y: list[int] = []
+    for y_poziom in POZIOMY_Y_DO_WYKRESU:
+        j = int(np.argmin(np.abs(y - y_poziom)))
+        indeksy_poziomow_y.append(j)
+
+    for iteracja in ITERACJE_DO_WYKRESU:
+        if iteracja not in migawki:
+            continue
+
+        u_przyblizone = migawki[iteracja]
+
+        plt.figure(figsize=(11, 7))
+
+        for j in indeksy_poziomow_y:
+            (linia_dokladna,) = plt.plot(
+                x,
+                u_dokladne_siatka[:, j],
+                linewidth=2.0,
+                label=f"dokladne, y = {y[j]:.2f}",
+            )
+
+            kolor = linia_dokladna.get_color()
+
+            plt.plot(
+                x,
+                u_przyblizone[:, j],
+                "o--",
+                color=kolor,
+                linewidth=1.2,
+                markersize=3,
+                markevery=2,
+                label=f"relaksacja, y = {y[j]:.2f}",
+            )
+
+        plt.xlabel("x")
+        plt.ylabel("u(x, y)")
+        plt.title(f"Przekroje rozwiazania po {iteracja} iteracjach")
+        plt.grid(True)
+        plt.legend(ncol=2, fontsize=9)
+        plt.tight_layout()
+        plt.savefig(KATALOG_WYKRESOW / f"przekroje_iteracja_{iteracja}.png", dpi=200)
+
+        plt.show()
+
+
+def rysuj_przekroje_koncowe(wynik: WynikLaplace) -> None:
+    """
+    Rysuje przekroje końcowego rozwiązania numerycznego.
+
+    Wejście:
+    - wynik: wynik obliczeń zawierający siatkę x, y, rozwiązanie
+      dokładne oraz końcowe rozwiązanie numeryczne
+
+    Wyjście:
+    - nic, tworzy, zapisuje i opcjonalnie wyświetla wykres
+    """
+    x = wynik["x"]
+    y = wynik["y"]
+    u_dokladne_siatka = wynik["u_dokladne"]
+    u_koncowe = wynik["u"]
+
+    plt.figure(figsize=(11, 7))
+
+    for y_poziom in POZIOMY_Y_DO_WYKRESU:
+        j = int(np.argmin(np.abs(y - y_poziom)))
+
+        (linia_dokladna,) = plt.plot(
+            x,
+            u_dokladne_siatka[:, j],
+            linewidth=2.0,
+            label=f"dokladne, y = {y[j]:.2f}",
+        )
+
+        kolor = linia_dokladna.get_color()
+
+        plt.plot(
+            x,
+            u_koncowe[:, j],
+            "o--",
+            color=kolor,
+            linewidth=1.2,
+            markersize=3,
+            markevery=2,
+            label=f"relaksacja, y = {y[j]:.2f}",
+        )
+
+    plt.xlabel("x")
+    plt.ylabel("u(x, y)")
+    plt.title("Przekroje rozwiazania po zbieznosci")
+    plt.grid(True)
+    plt.legend(ncol=2, fontsize=9)
+    plt.tight_layout()
+    plt.savefig(KATALOG_WYKRESOW / "przekroje_iteracja_koniec.png", dpi=200)
+    plt.show()
+
+
+def rysuj_rozwiazanie_3d(wynik: WynikLaplace) -> None:
+    """
+    Rysuje wykres 3D końcowego rozwiązania numerycznego.
+
+    Wejście:
+    - wynik: wynik obliczeń zawierający siatkę x, y oraz końcowe
+      rozwiązanie numeryczne u
+
+    Wyjście:
+    - nic, tworzy, zapisuje i opcjonalnie wyświetla wykres 3D
+    """
+    x = wynik["x"]
+    y = wynik["y"]
+    u_num = wynik["u"]
+
+    X, Y = np.meshgrid(x, y, indexing="ij")
+
+    fig = plt.figure(figsize=(10, 7))
+    ax = fig.add_subplot(111, projection="3d")
+
+    powierzchnia = ax.plot_surface(
+        X,
+        Y,
+        u_num,
+        cmap="viridis",
+        edgecolor="none",
+    )
+
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
+    ax.set_zlabel("u(x, y)")
+    ax.set_title("Rozwiazanie numeryczne rownania Laplace'a - wykres 3D")
+
+    fig.colorbar(powierzchnia, ax=ax, shrink=0.75, pad=0.1)
+    plt.tight_layout()
+    plt.savefig(KATALOG_WYKRESOW / "rozwiazanie_3d.png", dpi=200)
+
+    plt.show()
+
+
+if __name__ == "__main__":
+    wyniki_badania = badanie_siatki()
+
+    wynik_do_wykresow = rozwiaz_laplace(
+        rozmiar_siatki=N_SIATKA_WYKRESY,
+        tolerancja=TOLERANCJA_WYKRESY,
+        max_iteracji=MAX_ITERACJI_WYKRESY,
+        iteracje_do_zapisu=ITERACJE_DO_WYKRESU,
+    )
+
+    print("\nWYNIK DLA WYKRESOW")
+    print(f"N = {wynik_do_wykresow['rozmiar_siatki']}")
+    print(f"h = {wynik_do_wykresow['krok_siatki']}")
+    print(f"iteracje = {wynik_do_wykresow['iteracje']}")
+    print(f"blad_maksymalny = {wynik_do_wykresow['blad_max']:.8e}")
+
+    rysuj_przekroje(
+        x=wynik_do_wykresow["x"],
+        y=wynik_do_wykresow["y"],
+        wartosci_siatka=wynik_do_wykresow["u_dokladne"],
+    )
+    rysuj_przekroje_dla_iteracji(wynik_do_wykresow)
+    rysuj_przekroje_koncowe(wynik_do_wykresow)
+    rysuj_rozwiazanie_3d(wynik_do_wykresow)
