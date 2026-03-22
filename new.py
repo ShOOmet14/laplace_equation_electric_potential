@@ -41,12 +41,12 @@ class WynikLaplace(TypedDict):
     x: npt.NDArray[np.float64]
     y: npt.NDArray[np.float64]
     u: npt.NDArray[np.float64]
-    h: float
+    krok_siatki: float
     iteracje: int
     migawki: dict[int, npt.NDArray[np.float64]]
     u_dokladne: npt.NDArray[np.float64]
     blad: npt.NDArray[np.float64]
-    blad_maksymalny: float
+    blad_max: float
     rozmiar_siatki: int
 
 
@@ -57,12 +57,12 @@ def rozwiaz_laplace(
     iteracje_do_zapisu: Collection[int] | None = None,
 ) -> WynikLaplace:
     """
-    Funkcja rozwiązująca równanie Laplace'a metodą Gausa_Seidla
+    Funkcja rozwiązująca równanie Laplace'a metodą Gaussa-Seidla
 
     Wejście: rozmiar siatki, tolerancja, maksymalna liczba iteracji,
     iteracje, dla których zapisywane są migawki rozwiązania
 
-    Wyjście: słownik zawierający rozwiązanie numeryczne, sitakę, liczbę iteracji oraz dane do analizy błędu
+    Wyjście: słownik zawierający rozwiązanie numeryczne, siatkę, liczbę iteracji oraz dane do analizy błędu
     """
 
     iteracje_zapisu = set(iteracje_do_zapisu or ())
@@ -87,7 +87,6 @@ def rozwiaz_laplace(
     migawki: dict[int, npt.NDArray[np.float64]] = {}
     iteracja = 0
 
-    # Metoda iteracyjna Gaussa-Seidla, zamiast Jacobiego
     for iteracja in range(1, max_iteracji + 1):
         max_zmiana = 0.0
 
@@ -128,16 +127,77 @@ def rozwiaz_laplace(
         "x": x,
         "y": y,
         "u": u,
-        "h": krok_siatki,
+        "krok_siatki": krok_siatki,
         "iteracje": iteracja,
         "migawki": migawki,
         "u_dokladne": siatka_dokladna,
         "blad": blad,
-        "blad_maksymalny": blad_max,
+        "blad_max": blad_max,
         "rozmiar_siatki": rozmiar_siatki,
     }
 
 
-#
+def badanie_siatki():
+    wyniki = []
+
+    print("\nBADANIE SIATKI I DOKŁADNOŚCI")
+    print(
+        f"{'rozmiar_siatki':>6} {'Krok siatki':>10} {'Iteracje':>10} {'Blad_max':>15}"
+    )
+
+    for rozmiar_siatki in ROZMIARY_SIATKI:
+        wynik = rozwiaz_laplace(
+            rozmiar_siatki=rozmiar_siatki,
+            tolerancja=TOLERANCJE[rozmiar_siatki],
+            max_iteracji=MAX_ITERACJI,
+        )
+
+        rekord = {
+            "rozmiar_siatki": wynik["rozmiar_siatki"],
+            "krok_siatki": wynik["krok_siatki"],
+            "iteracje": wynik["iteracje"],
+            "blad_max": wynik["blad_max"],
+        }
+
+        wyniki.append(rekord)
+
+        print(
+            f"{wynik['rozmiar_siatki']:>6}"
+            f"{wynik['krok_siatki']:>10.5f}"
+            f"{wynik['iteracje']:>12}"
+            f"{wynik['blad_max']:>15.8e}"
+        )
+
+    print("\nPrzybliżony rząd dokładności p:")
+
+    for k in range(len(wyniki) - 1):
+        krok_siatki_1 = wyniki[k]["krok_siatki"]
+        krok_siatki_2 = wyniki[k + 1]["krok_siatki"]
+        blad_max_1 = wyniki[k]["blad_max"]
+        blad_max_2 = wyniki[k + 1]["blad_max"]
+
+        p = np.log(blad_max_1 / blad_max_2) / np.log(krok_siatki_1 / krok_siatki_2)
+
+        print(
+            f"N = {wyniki[k]['rozmiar_siatki']:>3} -> "
+            f"N = {wyniki[k + 1]['rozmiar_siatki']:>3}: p = {p:.4f}"
+        )
+
+    pierwszy_dobry = next(
+        (wynik for wynik in wyniki if wynik["blad_max"] < 1e-4),
+        None,
+    )
+
+    if pierwszy_dobry is not None:
+        print(
+            f"\nDokładność lepsza od 1e-4 osiągnięta dla: "
+            f"N = {pierwszy_dobry['rozmiar_siatki']}, "
+            f"blad_max = {pierwszy_dobry['blad_max']:.8e}"
+        )
+    else:
+        print("\nNie osiągnięto poziomu 1e-4 dla zadanych siatek.")
+
+    return wyniki
+
 
 # if __name__ == "__main__":
