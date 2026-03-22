@@ -31,8 +31,9 @@ def u_dokladne(
     x: float | npt.NDArray[np.float64], y: float | npt.NDArray[np.float64]
 ) -> float | npt.NDArray[np.float64]:
     """
-    Część rzeczywista badanej funkcji zespolonej,
-    tutaj f(z) = exp(z), gdzie z = x + iy
+    Zwraca rozwiązanie dokladne u(x, y)
+
+    Funkcja ta jest częścią rzeczywistą funkcji zespolonej f(z) wprowadzonej przez użytkownika
     """
     return np.exp(x) * np.cos(y)
 
@@ -57,12 +58,19 @@ def rozwiaz_laplace(
     iteracje_do_zapisu: Collection[int] | None = None,
 ) -> WynikLaplace:
     """
-    Funkcja rozwiązująca równanie Laplace'a metodą Gaussa-Seidla
+    Rozwiązuje równanie Laplace'a na kwadracie [0, 1] x [0, 1]
+    metodą iteracyjną Gaussa-Seidla.
 
-    Wejście: rozmiar siatki, tolerancja, maksymalna liczba iteracji,
-    iteracje, dla których zapisywane są migawki rozwiązania
+    Parametry:
+    - rozmiar_siatki: liczba punktów siatki w każdym kierunku,
+    - tolerancja: warunek stopu iteracji,
+    - max_iteracji: maksymalna liczba iteracji,
+    - iteracje_do_zapisu: numery iteracji, dla których zapisywane
+      są migawki rozwiązania.
 
-    Wyjście: słownik zawierający rozwiązanie numeryczne, siatkę, liczbę iteracji oraz dane do analizy błędu
+    Zwraca:
+    - słownik zawierający siatkę, rozwiązanie numeryczne,
+      liczbę iteracji, migawki oraz dane do analizy błędu.
     """
 
     iteracje_zapisu = set(iteracje_do_zapisu or ())
@@ -137,7 +145,20 @@ def rozwiaz_laplace(
     }
 
 
-def badanie_siatki():
+def badanie_siatki() -> :
+    """
+    Uruchamia obliczenia dla kilku rozmiarów siatki i porównuje dokładność.
+
+    Funkcja:
+    - wywołuje solver dla kolejnych rozmiarów siatki,
+    - zbiera liczbę iteracji, krok siatki i błąd maksymalny,
+    - wypisuje przybliżony rząd dokładności,
+    - sprawdza, czy osiągnięto poziom błędu 1e-4.
+
+    Zwraca:
+    - listę słowników z wynikami dla kolejnych siatek.
+    """
+
     wyniki = []
 
     print("\nBADANIE SIATKI I DOKŁADNOŚCI")
