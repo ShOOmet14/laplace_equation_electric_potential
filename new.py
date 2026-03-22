@@ -61,14 +61,14 @@ def rozwiaz_laplace(
     Rozwiązuje równanie Laplace'a na kwadracie [0, 1] x [0, 1]
     metodą iteracyjną Gaussa-Seidla.
 
-    Parametry:
+    Wejście:
     - rozmiar_siatki: liczba punktów siatki w każdym kierunku,
     - tolerancja: warunek stopu iteracji,
     - max_iteracji: maksymalna liczba iteracji,
     - iteracje_do_zapisu: numery iteracji, dla których zapisywane
       są migawki rozwiązania.
 
-    Zwraca:
+    Wyjście:
     - słownik zawierający siatkę, rozwiązanie numeryczne,
       liczbę iteracji, migawki oraz dane do analizy błędu.
     """
@@ -145,7 +145,14 @@ def rozwiaz_laplace(
     }
 
 
-def badanie_siatki() -> :
+class RekordBadania(TypedDict):
+    rozmiar_siatki: int
+    krok_siatki: float
+    iteracje: int
+    blad_max: float
+
+
+def badanie_siatki() -> list[RekordBadania]:
     """
     Uruchamia obliczenia dla kilku rozmiarów siatki i porównuje dokładność.
 
@@ -155,11 +162,11 @@ def badanie_siatki() -> :
     - wypisuje przybliżony rząd dokładności,
     - sprawdza, czy osiągnięto poziom błędu 1e-4.
 
-    Zwraca:
-    - listę słowników z wynikami dla kolejnych siatek.
+    Wyjście:
+    - lista słowników z wynikami dla kolejnych siatek.
     """
 
-    wyniki = []
+    wyniki: list[RekordBadania] = []
 
     print("\nBADANIE SIATKI I DOKŁADNOŚCI")
     print(
@@ -173,7 +180,7 @@ def badanie_siatki() -> :
             max_iteracji=MAX_ITERACJI,
         )
 
-        rekord = {
+        rekord: RekordBadania = {
             "rozmiar_siatki": wynik["rozmiar_siatki"],
             "krok_siatki": wynik["krok_siatki"],
             "iteracje": wynik["iteracje"],
@@ -219,6 +226,44 @@ def badanie_siatki() -> :
         print("\nNie osiągnięto poziomu 1e-4 dla zadanych siatek.")
 
     return wyniki
+
+
+def rysuj_przekroje(
+    x: npt.NDArray[np.float64],
+    y: npt.NDArray[np.float64],
+    wartosci_siatka: npt.NDArray[np.float64],
+) -> None:
+    """
+    Rysuje przekorje funkcji dla wybranych poziomów y.
+
+    Wejście:
+    - x: współrzędne siatki w kierunku osi x
+    - y: współrzędne siatki w kierunku osi y
+    - wartosci_siatka: macierz wartości funkcji na siatce
+
+    Wyjście:
+    - nic, tworzy, zapisuje i wyświetla wykres
+    """
+
+    plt.figure(figsize=(11, 7))
+
+    for y_poziom in POZIOMY_Y_DO_WYKRESU:
+        j = int(np.argmin(np.abs(y - y_poziom)))
+
+        plt.plot(
+            x,
+            wartosci_siatka[:, j],
+            linewidth=2.5,
+            label=f"y = {y[j]:.2f}",
+        )
+
+    plt.xlabel("x")
+    plt.ylabel("u(x, y)")
+    plt.title("Przekroje funkcji na wybranych poziomach y")
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig("przekroje.png", dpi=200)
 
 
 # if __name__ == "__main__":
