@@ -1,0 +1,16 @@
+LABELS = {
+    "x_label": "x",
+    "y_label": "u(x, y)",
+    "y_axis_label": "y",
+    "z_label": "u(x, y)",
+    "exact_solution": "dokładne",
+    "numerical_solution": "relaksacja",
+    "cross_sections_title": "Przekroje funkcji na wybranych poziomach y",
+    "iteration_cross_sections_title": "Przekroje rozwiązania po {iteration} iteracjach",
+    "final_cross_sections_title": "Przekroje rozwiązania po zbieżności",
+    "solution_3d_title": "Rozwiązanie numeryczne równania Laplace'a - wykres 3D",
+    "cross_sections_file": "przekroje.png",
+    "iteration_cross_sections_file": "przekroje_iteracja_{iteration}.png",
+    "final_cross_sections_file": "przekroje_iteracja_koniec.png",
+    "solution_3d_file": "rozwiazanie_3d.png",
+}

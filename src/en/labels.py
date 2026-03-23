@@ -1,0 +1,16 @@
+LABELS = {
+    "x_label": "x",
+    "y_label": "u(x, y)",
+    "y_axis_label": "y",
+    "z_label": "u(x, y)",
+    "exact_solution": "exact",
+    "numerical_solution": "relaxation",
+    "cross_sections_title": "Cross-sections of the function at selected y levels",
+    "iteration_cross_sections_title": "Cross-sections of the solution after {iteration} iterations",
+    "final_cross_sections_title": "Cross-sections of the converged solution",
+    "solution_3d_title": "Numerical solution of Laplace's equation - 3D plot",
+    "cross_sections_file": "cross_sections.png",
+    "iteration_cross_sections_file": "cross_sections_iteration_{iteration}.png",
+    "final_cross_sections_file": "final_cross_sections.png",
+    "solution_3d_file": "solution_3d.png",
+}

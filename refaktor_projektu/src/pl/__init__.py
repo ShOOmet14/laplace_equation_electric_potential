@@ -1,1 +1,0 @@
-"""Polska warstwa tekstowa projektu."""
