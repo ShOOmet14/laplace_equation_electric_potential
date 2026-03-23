@@ -1,0 +1,19 @@
+Organizacja kodu, rozłożenie kodu na kilka plików
+
+Dodawać dynamiczne dodawanie funkcji zespolonej, dodatkowo program powinien obliczać wszystkie wyrazy brzegowe itd. sam, nie powinno się zmieniać w kodzie
+
+W tabeli zestawiającej wyniki
+"print("\nBADANIE SIATKI I DOKŁADNOŚCI")
+    print(f"{'Rozmiar':>6} {'Krok_siatki':>10} {'Iteracje':>10} {'Blad_max':>15}")" chciałbym, żeby kolumny były wszystkie pod sobą równo i rozdzieone znakiem |
+
+Wykres 3D dla postaci analitycznej
+Mapa błędu numeryczne - analityczne (wykres macierzy blad)
+
+Dodanie angielskich odpowiedników plików i wykresów, przetłumaczenie i zmienienie ścieżek zapisywanych plików, żeby odpowiadały danym językom
+
+PDF:
+1. Wstęp, opis równań, na czym polega problem, który porusza f(z), u(x,y) część rzeczywista f(z) oraz warunki brzegowe
+2. Opis metody relaksacyjnej Gaussa-Seidla
+3. Tabela z badaniem siatki i komentarz, że 10^-4 osiągniągane jest bardzo szybko
+4. Wykresy przedstawienie dla kilku iteracji i po zbieżności (jeżeli jest osiągnięta do max)
+5. Wnioski
