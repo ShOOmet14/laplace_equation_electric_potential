@@ -1,14 +1,15 @@
 from collections.abc import Collection
 
-from src.common.congif import DOMAIN_LENGTH
+import numpy as np
+import numpy.typing as npt
+
+from src.common.config import DOMAIN_LENGTH
 from src.common.models import LaplaceResultTypes
 
-import numpy.typing as npt
-import numpy as np
 
-
-def solve_laplace(
-    x: float | npt.NDArray[np.float64], y: float | npt.NDArray[np.float64]
+def exact_solution(
+    x: float | npt.NDArray[np.float64],
+    y: float | npt.NDArray[np.float64],
 ) -> float | npt.NDArray[np.float64]:
     """
     Return the exact solution u(x, y).
@@ -19,96 +20,97 @@ def solve_laplace(
     return np.exp(x) * np.cos(y)
 
 
-def rozwiaz_laplace(
-    rozmiar_siatki: int,
-    tolerancja: float,
-    max_iteracji: int,
-    iteracje_do_zapisu: Collection[int] | None = None,
-) -> WynikLaplace:
+def solve_laplace(
+    grid_size: int,
+    tolerance: float,
+    max_iterations: int,
+    iterations_to_save: Collection[int] | None = None,
+) -> LaplaceResultTypes:
     """
-    Rozwiązuje równanie Laplace'a na kwadracie [0, 1] x [0, 1]
-    metodą iteracyjną Gaussa-Seidla.
+    Solve the Laplace equation on the square [0, 1] x [0, 1] using the Gauss-Seidel iterative method.
 
-    Wejście:
-    - rozmiar_siatki: liczba punktów siatki w każdym kierunku,
-    - tolerancja: warunek stopu iteracji,
-    - max_iteracji: maksymalna liczba iteracji,
-    - iteracje_do_zapisu: numery iteracji, dla których zapisywane
-      są migawki rozwiązania.
+    Args:
+        grid_size: Number of grid points in each direction.
+        tolerance: Stopping criterion for the iteration.
+        max_iterations: Maximum number of iterations.
+        iterations_to_save: Iteration numbers for which solution snapshots are saved.
 
-    Wyjście:
-    - słownik zawierający siatkę, rozwiązanie numeryczne,
-      liczbę iteracji, migawki oraz dane do analizy błędu.
+    Returns:
+        A dictionary containing the grid, numerical solution, iteration count, snapshots, and error analysis data.
     """
 
-    iteracje_zapisu = set(iteracje_do_zapisu or ())
+    snapshot_iterations = set(iterations_to_save or ())
 
-    x = np.linspace(0.0, DLUGOSC_BOKU, rozmiar_siatki)
-    y = np.linspace(0.0, DLUGOSC_BOKU, rozmiar_siatki)
-    krok_siatki = DLUGOSC_BOKU / (rozmiar_siatki - 1)
+    x = np.linspace(0.0, DOMAIN_LENGTH, grid_size)
+    y = np.linspace(0.0, DOMAIN_LENGTH, grid_size)
+    grid_step = DOMAIN_LENGTH / (grid_size - 1)
 
-    # Konwencja:
-    # u[i, j] to nasze u[x_i, y_j], gdzie i, j są odpowiednimi
-    # indeksami dla osi X i Y.
+    # Convention:
+    # u[i, j] represents u[x_i, y_j], where i and j are the corresponding
+    # indices for the X and Y axes.
 
-    u = np.zeros((rozmiar_siatki, rozmiar_siatki), dtype=float)
+    numerical_solution = np.zeros((grid_size, grid_size), dtype=float)
 
-    # Warunki brzegowe funkcji dokładnej dla kwadratu [0, A] x [0, A],
-    # gdzie A to długość boku.
-    # Kolejno: y -> 0, y -> długość boku, x -> 0, x -> długość boku.
-    u[:, 0] = u_dokladne(x, 0.0)
-    u[:, -1] = u_dokladne(x, DLUGOSC_BOKU)
-    u[0, :] = u_dokladne(0.0, y)
-    u[-1, :] = u_dokladne(DLUGOSC_BOKU, y)
+    # Boundary conditions from the exact solution for the square [0, A] x [0, A],
+    # where A is the side length.
+    # In order: y -> 0, y -> side length, x -> 0, x -> side length.
+    numerical_solution[:, 0] = exact_solution(x, 0.0)
+    numerical_solution[:, -1] = exact_solution(x, DOMAIN_LENGTH)
+    numerical_solution[0, :] = exact_solution(0.0, y)
+    numerical_solution[-1, :] = exact_solution(DOMAIN_LENGTH, y)
 
-    migawki: dict[int, npt.NDArray[np.float64]] = {}
-    iteracja = 0
+    iteration_snapshots: dict[int, npt.NDArray[np.float64]] = {}
+    iteration_count = 0
 
-    for iteracja in range(1, max_iteracji + 1):
-        max_zmiana = 0.0
+    converged = False
 
-        for i in range(1, rozmiar_siatki - 1):
-            for j in range(1, rozmiar_siatki - 1):
-                stara_wartosc = u[i, j]
+    for iteration_count in range(1, max_iterations + 1):
+        max_change = 0.0
 
-                nowa_wartosc = 0.25 * (
-                    u[i + 1, j] + u[i - 1, j] + u[i, j + 1] + u[i, j - 1]
+        for i in range(1, grid_size - 1):
+            for j in range(1, grid_size - 1):
+                old_value = numerical_solution[i, j]
+
+                new_value = 0.25 * (
+                    numerical_solution[i + 1, j]
+                    + numerical_solution[i - 1, j]
+                    + numerical_solution[i, j + 1]
+                    + numerical_solution[i, j - 1]
                 )
 
-                u[i, j] = nowa_wartosc
+                numerical_solution[i, j] = new_value
 
-                zmiana = abs(nowa_wartosc - stara_wartosc)
-                if zmiana > max_zmiana:
-                    max_zmiana = zmiana
+                change = abs(new_value - old_value)
+                if change > max_change:
+                    max_change = change
 
-        if iteracja in iteracje_zapisu:
-            migawki[iteracja] = u.copy()
+        if iteration_count in snapshot_iterations:
+            iteration_snapshots[iteration_count] = numerical_solution.copy()
 
-        if max_zmiana < tolerancja:
-            print(f"Zbieżność osiągnięta po {iteracja} iteracjach")
+        if max_change < tolerance:
+            converged = True
             break
 
-    # Gdy pętla skończy się bez break.
-    else:
-        print("Nie osiągnięto zbieżności w maksymalnej liczbie iteracji")
-
-    # Porównanie metody numerycznej i dokładnej.
-    x_nowe, y_nowe = np.meshgrid(x, y, indexing="ij")
-    siatka_dokladna: npt.NDArray[np.float64] = np.asarray(
-        u_dokladne(x_nowe, y_nowe), dtype=np.float64
+    # Comparison of the numerical and exact solutions.
+    x_grid, y_grid = np.meshgrid(x, y, indexing="ij")
+    exact_solution_grid: npt.NDArray[np.float64] = np.asarray(
+        exact_solution(x_grid, y_grid),
+        dtype=np.float64,
     )
-    blad = np.abs(u - siatka_dokladna)
-    blad_max = float(np.max(blad))
+
+    error = np.abs(numerical_solution - exact_solution_grid)
+    max_error = float(np.max(error))
 
     return {
         "x": x,
         "y": y,
-        "u": u,
-        "krok_siatki": krok_siatki,
-        "iteracje": iteracja,
-        "migawki": migawki,
-        "u_dokladne": siatka_dokladna,
-        "blad": blad,
-        "blad_max": blad_max,
-        "rozmiar_siatki": rozmiar_siatki,
+        "numerical_solution": numerical_solution,
+        "grid_step": grid_step,
+        "iterations": iteration_count,
+        "converged": converged,
+        "iteration_snapshots": iteration_snapshots,
+        "exact_solution": exact_solution_grid,
+        "error": error,
+        "max_error": max_error,
+        "grid_size": grid_size,
     }
