@@ -17,9 +17,7 @@ def exact_solution(
     This function represents the real part of the complex-valued function
     f(z) introduced by the user.
     """
-    x0 = 1.3
-    y0 = 0.5
-    return np.log((x - x0) ** 2 + (y - y0) ** 2)
+    return np.exp(x) * np.cos(y)
 
 
 def solve_laplace(
