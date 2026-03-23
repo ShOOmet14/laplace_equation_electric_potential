@@ -10,6 +10,9 @@ from src.common.config import (
 from src.common.models import GridStudyRecordTypes, LaplaceResultTypes
 from src.common.paths import get_images_dir
 from src.common.plotting import (
+    plot_3d_error,
+    plot_error_map,
+    plot_3d_exact_solution,
     plot_3d_solution,
     plot_cross_sections,
     plot_cross_sections_for_iterations,
@@ -24,13 +27,14 @@ def print_grid_study_results(results: list[GridStudyRecordTypes]) -> None:
     Print the grid study results in Polish.
     """
     print("\nBADANIE SIATKI I DOKŁADNOŚCI")
-    print(f"{'Rozmiar':>6} {'Krok siatki':>12} {'Iteracje':>12} {'Błąd max':>15}")
+    print(f"{'Rozmiar':>8} | {'Krok siatki':>12} | {'Iteracje':>10} | {'Błąd max':>15}")
+    print("-" * 57)
 
     for record in results:
         print(
-            f"{record['grid_size']:>6}"
-            f"{record['grid_step']:>12.5f}"
-            f"{record['iterations']:>12}"
+            f"{record['grid_size']:>8} | "
+            f"{record['grid_step']:>12.5f} | "
+            f"{record['iterations']:>10} | "
             f"{record['max_error']:>15.8e}"
         )
 
@@ -143,6 +147,24 @@ def main() -> None:
     )
 
     plot_3d_solution(
+        result=result,
+        output_dir=output_dir,
+        labels=LABELS,
+    )
+
+    plot_3d_exact_solution(
+        result=result,
+        output_dir=output_dir,
+        labels=LABELS,
+    )
+
+    plot_3d_error(
+        result=result,
+        output_dir=output_dir,
+        labels=LABELS,
+    )
+
+    plot_error_map(
         result=result,
         output_dir=output_dir,
         labels=LABELS,

@@ -258,3 +258,112 @@ def plot_3d_solution(
     plt.savefig(output_dir / labels["solution_3d_file"], dpi=200)
     plt.show()
     plt.close()
+
+
+def plot_3d_exact_solution(
+    result: LaplaceResultTypes,
+    output_dir: Path,
+    labels: dict[str, str],
+) -> None:
+    """
+    Plot the exact analytical solution as a 3D surface.
+    """
+
+    x = result["x"]
+    y = result["y"]
+    exact_values = result["exact_solution"]
+
+    x_grid, y_grid = np.meshgrid(x, y, indexing="ij")
+
+    fig = plt.figure(figsize=(10, 7))
+    ax = fig.add_subplot(1, 1, 1, projection="3d")
+
+    surface = ax.plot_surface(
+        x_grid,
+        y_grid,
+        exact_values,
+        cmap="viridis",
+        edgecolor="none",
+    )
+
+    ax.set_xlabel(labels["x_label"])
+    ax.set_ylabel(labels["y_axis_label"])
+    ax.set_zlabel(labels["z_label"])
+    ax.set_title(labels["exact_solution_3d_title"])
+
+    fig.colorbar(surface, ax=ax, shrink=0.75, pad=0.1)
+    plt.tight_layout()
+    plt.savefig(output_dir / labels["exact_solution_3d_file"], dpi=200)
+    plt.show()
+    plt.close()
+
+
+def plot_3d_error(
+    result: LaplaceResultTypes,
+    output_dir: Path,
+    labels: dict[str, str],
+) -> None:
+    """
+    Plot the absolute error |u_num - u_exact| as a 3D surface.
+    """
+
+    x = result["x"]
+    y = result["y"]
+    error_values = result["error"]
+
+    x_grid, y_grid = np.meshgrid(x, y, indexing="ij")
+
+    fig = plt.figure(figsize=(10, 7))
+    ax = fig.add_subplot(1, 1, 1, projection="3d")
+
+    surface = ax.plot_surface(
+        x_grid,
+        y_grid,
+        error_values,
+        cmap="inferno",
+        edgecolor="none",
+    )
+
+    ax.set_xlabel(labels["x_label"])
+    ax.set_ylabel(labels["y_axis_label"])
+    ax.set_zlabel(labels["error_z_label"])
+    ax.set_title(labels["error_3d_title"])
+
+    fig.colorbar(surface, ax=ax, shrink=0.75, pad=0.1)
+    plt.tight_layout()
+    plt.savefig(output_dir / labels["error_3d_file"], dpi=200)
+    plt.show()
+    plt.close()
+
+
+def plot_error_map(
+    result: LaplaceResultTypes,
+    output_dir: Path,
+    labels: dict[str, str],
+) -> None:
+    """
+    Plot the signed difference u_num - u_exact as a matrix heatmap.
+    """
+
+    x = result["x"]
+    y = result["y"]
+    signed_error = result["numerical_solution"] - result["exact_solution"]
+
+    plt.figure(figsize=(8, 7))
+
+    image = plt.imshow(
+        signed_error.T,
+        origin="lower",
+        extent=(float(x[0]), float(x[-1]), float(y[0]), float(y[-1])),
+        cmap="coolwarm",
+        aspect="equal",
+    )
+
+    plt.xlabel(labels["x_label"])
+    plt.ylabel(labels["y_axis_label"])
+    plt.title(labels["error_map_title"])
+    plt.colorbar(image, label=labels["error_map_colorbar_label"])
+    plt.tight_layout()
+    plt.savefig(output_dir / labels["error_map_file"], dpi=200)
+    plt.show()
+    plt.close()

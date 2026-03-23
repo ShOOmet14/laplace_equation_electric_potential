@@ -10,6 +10,9 @@ from src.common.config import (
 from src.common.models import GridStudyRecordTypes, LaplaceResultTypes
 from src.common.paths import get_images_dir
 from src.common.plotting import (
+    plot_3d_error,
+    plot_error_map,
+    plot_3d_exact_solution,
     plot_3d_solution,
     plot_cross_sections,
     plot_cross_sections_for_iterations,
@@ -24,13 +27,14 @@ def print_grid_study_results(results: list[GridStudyRecordTypes]) -> None:
     Print the grid study results in English.
     """
     print("\nGRID STUDY AND ACCURACY")
-    print(f"{'Grid':>6} {'Grid step':>12} {'Iterations':>12} {'Max error':>15}")
+    print(f"{'Grid':>8} | {'Grid step':>12} | {'Iterations':>10} | {'Max error':>15}")
+    print("-" * 57)
 
     for record in results:
         print(
-            f"{record['grid_size']:>6}"
-            f"{record['grid_step']:>12.5f}"
-            f"{record['iterations']:>12}"
+            f"{record['grid_size']:>8} | "
+            f"{record['grid_step']:>12.5f} | "
+            f"{record['iterations']:>10} | "
             f"{record['max_error']:>15.8e}"
         )
 
@@ -145,6 +149,24 @@ def main() -> None:
     )
 
     plot_3d_solution(
+        result=result,
+        output_dir=output_dir,
+        labels=LABELS,
+    )
+
+    plot_3d_exact_solution(
+        result=result,
+        output_dir=output_dir,
+        labels=LABELS,
+    )
+
+    plot_3d_error(
+        result=result,
+        output_dir=output_dir,
+        labels=LABELS,
+    )
+
+    plot_error_map(
         result=result,
         output_dir=output_dir,
         labels=LABELS,
