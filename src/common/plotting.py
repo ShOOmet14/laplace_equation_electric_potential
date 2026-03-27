@@ -55,7 +55,9 @@ def plot_cross_sections(
     - None.
     """
 
-    plt.figure(figsize=(11, 7))
+    width_inch: int = 11
+    height_inch: int = 7
+    plt.figure(figsize=(width_inch, height_inch))
 
     y_indices = get_y_level_indices(y)
 
@@ -111,8 +113,9 @@ def plot_cross_sections_for_iterations(
             continue
 
         approximate_values = snapshots[iteration]
-
-        plt.figure(figsize=(11, 7))
+        width_inch: int = 11
+        height_inch: int = 7
+        plt.figure(figsize=(width_inch, height_inch))
 
         for j in y_indices:
             (exact_line,) = plt.plot(
@@ -175,7 +178,9 @@ def plot_final_cross_sections(
     exact_values = result["exact_solution"]
     numerical_values = result["numerical_solution"]
 
-    plt.figure(figsize=(11, 7))
+    width_inch: int = 11
+    height_inch: int = 7
+    plt.figure(figsize=(width_inch, height_inch))
 
     y_indices = get_y_level_indices(y)
 
@@ -237,7 +242,9 @@ def plot_3d_solution(
 
     x_grid, y_grid = np.meshgrid(x, y, indexing="ij")
 
-    fig = plt.figure(figsize=(10, 7))
+    width_inch: int = 11
+    height_inch: int = 7
+    fig = plt.figure(figsize=(width_inch, height_inch))
     ax = fig.add_subplot(1, 1, 1, projection="3d")
 
     surface = ax.plot_surface(
@@ -275,7 +282,9 @@ def plot_3d_exact_solution(
 
     x_grid, y_grid = np.meshgrid(x, y, indexing="ij")
 
-    fig = plt.figure(figsize=(10, 7))
+    width_inch: int = 11
+    height_inch: int = 7
+    fig = plt.figure(figsize=(width_inch, height_inch))
     ax = fig.add_subplot(1, 1, 1, projection="3d")
 
     surface = ax.plot_surface(
@@ -313,7 +322,9 @@ def plot_3d_error(
 
     x_grid, y_grid = np.meshgrid(x, y, indexing="ij")
 
-    fig = plt.figure(figsize=(10, 7))
+    width_inch: int = 11
+    height_inch: int = 7
+    fig = plt.figure(figsize=(width_inch, height_inch))
     ax = fig.add_subplot(1, 1, 1, projection="3d")
 
     surface = ax.plot_surface(
@@ -349,7 +360,9 @@ def plot_error_map(
     y = result["y"]
     signed_error = result["numerical_solution"] - result["exact_solution"]
 
-    plt.figure(figsize=(8, 7))
+    width_inch: int = 8
+    height_inch: int = 7
+    plt.figure(figsize=(width_inch, height_inch))
 
     image = plt.imshow(
         signed_error.T,
