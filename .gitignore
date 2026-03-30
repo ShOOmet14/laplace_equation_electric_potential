@@ -1,4 +1,4 @@
-my_stuff/
-venv/
+# my_stuff/
+# venv/
 __pycache__/
 *.py[cod]
