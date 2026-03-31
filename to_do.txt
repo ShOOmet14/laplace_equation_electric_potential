@@ -9,6 +9,7 @@
         -> image output file path change
         -> language of the app change
 
+998. Update LaTeX code, make a full documentation inside the PDF file, then add it to this project files
 999. Add requirements.txt before publishing
 
 ------------
