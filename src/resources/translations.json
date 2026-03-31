@@ -1,0 +1,100 @@
+{
+	"en": {
+		"input": {
+			"function_prompt": "Provide complex function formula f(z) = ",
+			"try_again": "Press Enter to try again..."
+		},
+		"messages": {
+			"harmonic_ok": "This real part is harmonic and can be used as an exact solution.",
+			"harmonic_bad": "This real part is not harmonic, so it cannot be used as an exact Laplace solution.",
+			"grid_study_title": "GRID STUDY AND ACCURACY",
+			"grid_header_grid": "Grid",
+			"grid_header_step": "Grid step",
+			"grid_header_iterations": "Iterations",
+			"grid_header_max_error": "Max error",
+			"estimated_order_title": "Estimated order of accuracy p:",
+			"accuracy_reached": "Accuracy better than {threshold:.0e} achieved for: Grid size = {grid_size}, Max error = {max_error:.8e}",
+			"accuracy_not_reached": "The level {threshold:.0e} was not reached for the tested grids.",
+			"converged": "Convergence achieved after {iterations} iterations",
+			"not_converged": "Convergence was not achieved within the maximum number of iterations",
+			"plot_result_title": "RESULT FOR PLOTS",
+			"grid_size": "Grid size = {grid_size}",
+			"grid_step": "Grid step = {grid_step}",
+			"iterations_count": "Number of iterations = {iterations}",
+			"max_error_line": "Max error = {max_error:.8e}"
+		},
+		"plots": {
+			"x_label": "x",
+			"y_label": "u(x, y)",
+			"y_axis_label": "y",
+			"z_label": "u(x, y)",
+			"cross_sections_title": "Cross-sections of the function at selected y levels",
+			"iteration_cross_sections_title": "Cross-sections of the solution after {iteration} iterations",
+			"final_cross_sections_title": "Cross-sections of the converged solution",
+			"solution_3d_title": "Numerical solution of Laplace's equation - 3D plot",
+			"exact_solution_3d_title": "Analytical solution of Laplace's equation - 3D plot",
+			"cross_sections_file": "cross_sections.png",
+			"iteration_cross_sections_file": "cross_sections_iteration_{iteration}.png",
+			"final_cross_sections_file": "final_cross_sections.png",
+			"solution_3d_file": "solution_3d.png",
+			"exact_solution_3d_file": "analytical_solution_3d.png",
+			"error_3d_title": "Absolute error |u_num - u_exact| - 3D plot",
+			"error_3d_file": "error_3d.png",
+			"error_z_label": "|u_num - u_exact|",
+			"error_map_title": "Error map: u_num - u_exact",
+			"error_map_file": "error_map.png",
+			"error_map_colorbar_label": "u_num - u_exact",
+			"exact_solution": "exact",
+			"numerical_solution": "relaxation"
+		}
+	},
+	"pl": {
+		"input": {
+			"function_prompt": "Podaj wzór funkcji zespolonej f(z) = ",
+			"try_again": "Naciśnij Enter, aby spróbować ponownie..."
+		},
+		"messages": {
+			"harmonic_ok": "Ta część rzeczywista jest harmoniczna i może być użyta jako rozwiązanie dokładne.",
+			"harmonic_bad": "Ta część rzeczywista nie jest harmoniczna, więc nie może być użyta jako dokładne rozwiązanie równania Laplace'a.",
+			"grid_study_title": "BADANIE SIATKI I DOKŁADNOŚCI",
+			"grid_header_grid": "Rozmiar",
+			"grid_header_step": "Krok siatki",
+			"grid_header_iterations": "Iteracje",
+			"grid_header_max_error": "Błąd max",
+			"estimated_order_title": "Przybliżony rząd dokładności p:",
+			"accuracy_reached": "Dokładność lepsza od {threshold:.0e} osiągnięta dla: Rozmiar siatki = {grid_size}, Błąd max = {max_error:.8e}",
+			"accuracy_not_reached": "Nie osiągnięto poziomu {threshold:.0e} dla zadanych siatek.",
+			"converged": "Zbieżność osiągnięta po {iterations} iteracjach",
+			"not_converged": "Nie osiągnięto zbieżności w maksymalnej liczbie iteracji",
+			"plot_result_title": "WYNIK DLA WYKRESÓW",
+			"grid_size": "Rozmiar siatki = {grid_size}",
+			"grid_step": "Krok siatki = {grid_step}",
+			"iterations_count": "Liczba iteracji = {iterations}",
+			"max_error_line": "Błąd max = {max_error:.8e}"
+		},
+		"plots": {
+			"x_label": "x",
+			"y_label": "u(x, y)",
+			"y_axis_label": "y",
+			"z_label": "u(x, y)",
+			"cross_sections_title": "Przekroje funkcji na wybranych poziomach y",
+			"iteration_cross_sections_title": "Przekroje rozwiązania po {iteration} iteracjach",
+			"final_cross_sections_title": "Przekroje rozwiązania po zbieżności",
+			"solution_3d_title": "Rozwiązanie numeryczne równania Laplace'a - wykres 3D",
+			"exact_solution_3d_title": "Rozwiązanie analityczne równania Laplace'a - wykres 3D",
+			"cross_sections_file": "przekroje.png",
+			"iteration_cross_sections_file": "przekroje_iteracja_{iteration}.png",
+			"final_cross_sections_file": "przekroje_iteracja_koniec.png",
+			"solution_3d_file": "rozwiazanie_3d.png",
+			"exact_solution_3d_file": "rozwiazanie_analityczne_3d.png",
+			"error_3d_title": "Błąd bezwzględny |u_num - u_dokł| - wykres 3D",
+			"error_3d_file": "blad_3d.png",
+			"error_z_label": "|u_num - u_dokł|",
+			"error_map_title": "Mapa błędu u_num - u_dokł",
+			"error_map_file": "mapa_bledu.png",
+			"error_map_colorbar_label": "u_num - u_dokł",
+			"exact_solution": "dokładne",
+			"numerical_solution": "relaksacja"
+		}
+	}
+}

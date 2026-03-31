@@ -10,6 +10,13 @@ from sympy import I, Symbol, Expr
 
 from src.common.config import DOMAIN_LENGTH
 from src.common.models import LaplaceResultTypes
+from src.common.i18n import Translator
+
+# Global variable for storing function as lamba function not expression
+function_lambda: Callable[
+    [float | npt.NDArray[np.float64], float | npt.NDArray[np.float64]],
+    float | npt.NDArray[np.float64],
+]
 
 
 def clear_console() -> None:
@@ -45,15 +52,15 @@ def require_expr(value: object, name: str) -> Expr:
     return value
 
 
-def get_user_function() -> Expr:
+def get_user_function(tr: Translator) -> None:
     """
-    Function that takes an input from the user, then checks if the complex function is harmonic or not (solved Laplace equation) and then returns that Expression to turn it into callable lamba functions
+    Function that takes an input from the user, then checks if the complex function is harmonic or not (solved Laplace equation) and then runs function create_lambda_function() that stores a numpy lambda function after converting it from an expression
 
     Args:
     - None
 
     Output:
-    - Expression to turn into lamba function
+    - None
     """
 
     x: Symbol = Symbol("x", real=True)
@@ -62,14 +69,14 @@ def get_user_function() -> Expr:
 
     while True:
         clear_console()
-        user_input: str = input("Provide complex function formula f(z) = ")
+        user_input: str = input(tr.t("input.function_prompt"))
 
-        prased_function: Expr = require_expr(
-            sympy.parse_expr(user_input), "prased_function"
+        parsed_function: Expr = require_expr(
+            sympy.parse_expr(user_input), "parsed_function"
         )
 
         function_substitution: Expr = require_expr(
-            prased_function.subs(z, x + I * y), "function_substitution"
+            parsed_function.subs(z, x + I * y), "function_substitution"
         )
 
         # For complicated functions I need to expand them first into real part and complex part as specified in SymPy docs
@@ -93,91 +100,57 @@ def get_user_function() -> Expr:
         derivative_x_x: Expr = require_expr(
             sympy.diff(simplified_real_part, x, 2), "derivative_x_x"
         )
-        print(f"Second order derivative for x: {derivative_x_x}")
 
         derivative_y_y: Expr = require_expr(
             sympy.diff(simplified_real_part, y, 2), "derivative_y_y"
         )
-        print(f"Second order derivative for y: {derivative_y_y}")
 
         laplacian: Expr = require_expr(
             cast(object, sympy.Add(derivative_x_x, derivative_y_y)), "laplacian"
         )
-        print(f"Laplacian = {laplacian}")
 
-        if laplacian == 0:
-            print("This real part is harmonic and can be used as an exact solution.")
+        if sympy.simplify(laplacian).equals(0):
+            print(tr.t("messages.harmonic_ok"))
             break
-        else:
-            print(
-                "This real part is not harmonic, so it cannot be used as an exact Laplace solution."
-            )
 
-    return simplified_real_part
+        print(tr.t("messages.harmonic_bad"))
+        input(tr.t("input.try_again"))
+
+    create_lambda_function(simplified_real_part)
 
 
-def boundary_conditions(real_part: Expr) -> tuple[Callable[[float, float], float], ...]:
+def create_lambda_function(
+    real_part: Expr,
+) -> None:
     """
-    Function that finds boundary conditions expressions and turns them into callable lamba functions.
+    Function that turns a given symbolic expression into callable lambda function
 
     Args:
     - Real part of given function f(z), provided by the user in get_user_function()
 
     Output:
-    - A tuple of callable lambda functions for later analaysis
+    - None
     """
 
     x: Symbol = Symbol("x", real=True)
     y: Symbol = Symbol("y", real=True)
 
-    # Boundary conditions from the exact solution for the square [0, A] x [0, A],
-    # where A is the side length.
-    # In order: x -> 0, x -> side length, y -> 0, y -> side length.
-    left: Expr = require_expr(
-        cast(object, sympy.simplify(real_part.subs(x, 0))), "left"
-    )
-    right: Expr = require_expr(
-        cast(object, sympy.simplify(real_part.subs(x, DOMAIN_LENGTH))),
-        "right",
-    )
-    bottom: Expr = require_expr(
-        cast(object, sympy.simplify(real_part.subs(y, 0))), "bottom"
-    )
-    top: Expr = require_expr(
-        cast(object, sympy.simplify(real_part.subs(y, DOMAIN_LENGTH))), "top"
-    )
-
-    # Turning them into lamba functions
-
-    left_lambda: Callable[[float, float], float] = sympy.lambdify((x, y), left, "numpy")
-    right_lamba: Callable[[float, float], float] = sympy.lambdify(
-        (x, y), right, "numpy"
-    )
-    top_lambda: Callable[[float, float], float] = sympy.lambdify((x, y), top, "numpy")
-    bottom_lambda: Callable[[float, float], float] = sympy.lambdify(
-        (x, y), bottom, "numpy"
-    )
-
-    return (left_lambda, right_lamba, top_lambda, bottom_lambda)
+    global function_lambda
+    function_lambda = sympy.lambdify((x, y), real_part, "numpy")
 
 
 def exact_solution(
     x: float | npt.NDArray[np.float64],
     y: float | npt.NDArray[np.float64],
-    real_part: Expr,
 ) -> float | npt.NDArray[np.float64]:
     """
     Return the exact solution u(x, y).
 
     This function represents the real part of the complex-valued function f(z) introduced by the user.
     """
+    global function_lambda
 
-    function: Callable[
-        [float | npt.NDArray[np.float64], float | npt.NDArray[np.float64]],
-        float | npt.NDArray[np.float64],
-    ] = sympy.lambdify((x, y), real_part, "numpy")
-
-    return function(x, y)
+    return function_lambda(x, y)
 
 
 def solve_laplace(
@@ -185,6 +158,8 @@ def solve_laplace(
     tolerance: float,
     max_iterations: int,
     iterations_to_save: Collection[int] | None = None,
+    tr: Translator | None = None,
+    print_summary: bool = False,
 ) -> LaplaceResultTypes:
     """
     Solve the Laplace equation on the square [0, 1] x [0, 1] using the Gauss-Seidel iterative method.
@@ -258,7 +233,7 @@ def solve_laplace(
     error = np.abs(numerical_solution - exact_solution_grid)
     max_error = float(np.max(error))
 
-    return {
+    result: LaplaceResultTypes = {
         "x": x,
         "y": y,
         "numerical_solution": numerical_solution,
@@ -271,3 +246,20 @@ def solve_laplace(
         "max_error": max_error,
         "grid_size": grid_size,
     }
+
+    if print_summary:
+        if tr is None:
+            raise ValueError("Translator must be provided when print_summary=True")
+
+        if result["converged"]:
+            print(tr.t("messages.converged", iterations=result["iterations"]))
+        else:
+            print(tr.t("messages.not_converged"))
+
+        print(f"\n{tr.t('messages.plot_result_title')}")
+        print(tr.t("messages.grid_size", grid_size=result["grid_size"]))
+        print(tr.t("messages.grid_step", grid_step=result["grid_step"]))
+        print(tr.t("messages.iterations_count", iterations=result["iterations"]))
+        print(tr.t("messages.max_error_line", max_error=result["max_error"]))
+
+    return result
