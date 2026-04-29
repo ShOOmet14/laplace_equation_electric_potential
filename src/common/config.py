@@ -1,21 +1,21 @@
 DOMAIN_LENGTH = 1.0
 
-# GRID_SIZES = (10, 20, 40, 80)
-GRID_SIZES = (5, 10, 20, 40)
-
-# TOLERANCES = {
-#     10: 1e-10,
-#     20: 1e-10,
-#     40: 1e-11,
-#     80: 1e-11,
-# }
+GRID_SIZES = (10, 20, 40, 80)
+# GRID_SIZES = (5, 10, 20, 40)
 
 TOLERANCES = {
-    5: 1e-10,
     10: 1e-10,
-    20: 1e-11,
+    20: 1e-10,
     40: 1e-11,
+    80: 1e-11,
 }
+
+# TOLERANCES = {
+#     5: 1e-10,
+#     10: 1e-10,
+#     20: 1e-11,
+#     40: 1e-11,
+# }
 
 MAX_ITERATIONS = 50000
 
