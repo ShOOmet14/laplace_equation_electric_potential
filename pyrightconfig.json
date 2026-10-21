@@ -1,4 +1,9 @@
 {
+	"include": ["run.py", "src"],
+	"exclude": ["**/__pycache__"],
+	"venvPath": ".",
+	"venv": "venv",
 	"typeCheckingMode": "strict",
+	"reportMissingTypeStubs": "none",
 	"reportUnknownMemberType": "none"
 }
