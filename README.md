@@ -11,7 +11,7 @@ The program solves a Dirichlet boundary-value problem on the unit square. A
 complex function `f(z)` is supplied as a SymPy expression, and its real part
 
 $$
-u(x,y) = \operatorname{Re}(f(x+iy))
+u(x,y) = \mathrm{Re}(f(x+iy))
 $$
 
 is checked symbolically for harmonicity. Values of this exact solution define
